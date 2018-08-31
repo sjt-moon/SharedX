@@ -6,7 +6,10 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import hello.Socket.Client;
+import hello.Utils.SocketThreadFactory;
 import org.apache.logging.log4j.util.Strings;
+
+import java.util.concurrent.*;
 
 @SpringUI(path = "/text")
 public class TextUI extends UI {
@@ -19,15 +22,15 @@ public class TextUI extends UI {
 
     private final static long SLEEP_DURATION = 2L;
 
+    private final SocketThreadFactory threadFactory = new SocketThreadFactory();
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        Thread t1 = new Thread(){
-            @Override
-            public void run() {
-                client.run();
-            }
-        };
-        t1.start();
+
+        Thread clientThread = threadFactory.newThread(client);
+        clientThread.start();
+
+        startTextSender();
 
         setupLayout();
         addHeader();
@@ -73,10 +76,15 @@ public class TextUI extends UI {
      * heartbeat, periodically get text field data & send to the server
      */
     private void startTextSender() {
-        // client.sendMessage(textArea.getValue());
-    }
-
-    private void sleep(long seconds) throws InterruptedException {
-        Thread.sleep(seconds * 1000);
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        Runnable task = () -> {
+            try {
+                client.sendMessage(textArea.getValue());
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+        scheduledExecutorService.scheduleWithFixedDelay(task, SLEEP_DURATION, SLEEP_DURATION, TimeUnit.SECONDS);
     }
 }
