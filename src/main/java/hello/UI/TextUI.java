@@ -11,10 +11,14 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.concurrent.*;
 
-@SpringUI(path = "/text")
+import static hello.UI.TextUI.urlId;
+
+@SpringUI(path = urlId)
 public class TextUI extends UI {
 
-    private final Client client = new Client();
+    static final String urlId = "/text";
+
+    private final Client client = new Client(urlId);
 
     private VerticalLayout layout;
 

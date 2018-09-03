@@ -1,5 +1,7 @@
 package hello.Socket;
 
+import com.google.gson.Gson;
+import hello.Utils.Message;
 import hello.Utils.MetaUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -12,8 +14,18 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
 public final class Client implements Runnable {
+    /**
+     * the unique id for this client
+     */
+    private final String urlId;
 
-    private final ClientHandler clientHandler = new ClientHandler();
+    private final ClientHandler clientHandler;
+
+    public Client(String urlId) {
+        super();
+        this.urlId = urlId;
+        clientHandler = new ClientHandler(urlId);
+    }
 
     @Override
     public void run() {
@@ -51,10 +63,10 @@ public final class Client implements Runnable {
     }
 
     /**
-     * send message to server
-     * @param message message to be sent
+     * send message (Message.class, a {urlId, text} json) to server
+     * @param text text message to be sent
      */
-    public void sendMessage(String message) {
-        clientHandler.sendMessage(message);
+    public void sendMessage(String text) {
+        clientHandler.sendMessage(new Message(urlId, text).toString());
     }
 }

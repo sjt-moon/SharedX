@@ -5,9 +5,19 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ClientHandler extends SimpleChannelInboundHandler<String> {
 
+    /**
+     * the unique id for this client
+     */
+    private final String urlId;
+
     private ChannelHandlerContext ctx;
 
-    public void sendMessage(String message) {
+    ClientHandler(String urlId) {
+        super();
+        this.urlId = urlId;
+    }
+
+    void sendMessage(String message) {
         if (ctx != null) {
             ctx.writeAndFlush(message);
 
