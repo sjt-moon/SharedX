@@ -1,5 +1,6 @@
 package hello.Socket;
 
+import hello.Utils.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -11,6 +12,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
     private final String urlId;
 
     private ChannelHandlerContext ctx;
+
+    public boolean used = false;
+
+    public Message receivedMessage = null;
 
     ClientHandler(String urlId) {
         super();
@@ -44,6 +49,14 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String message) throws Exception {
         System.out.println("Received message: " + message);
-        // ctx.writeAndFlush(message + MetaUtils.LINE_SEPARATOR);
+
+        Message recv = Message.getMessage(message);
+        /*
+        * if null or recv is not parsed successfully */
+        if (recv == null) {
+            return;
+        }
+        receivedMessage = recv;
+        used = false;
     }
 }

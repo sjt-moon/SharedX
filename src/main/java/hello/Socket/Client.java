@@ -1,6 +1,5 @@
 package hello.Socket;
 
-import com.google.gson.Gson;
 import hello.Utils.Message;
 import hello.Utils.MetaUtils;
 import io.netty.bootstrap.Bootstrap;
@@ -12,6 +11,7 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import com.vaadin.ui.*;
 
 public final class Client implements Runnable {
     /**
@@ -19,9 +19,24 @@ public final class Client implements Runnable {
      */
     private final String urlId;
 
+    /**
+     * previous text read from text editor
+     */
+    private String prevText = "";
+
+    /**
+     * current text read from text editor
+     */
+    private String currText = "";
+
+    /**
+     * UI text area
+     */
+    TextArea textArea;
+
     private final ClientHandler clientHandler;
 
-    public Client(String urlId) {
+    public Client(String urlId, TextArea textArea) {
         super();
         this.urlId = urlId;
         clientHandler = new ClientHandler(urlId);
@@ -64,9 +79,29 @@ public final class Client implements Runnable {
 
     /**
      * send message (Message.class, a {urlId, text} json) to server
-     * @param text text message to be sent
+     * @param message Message structure to be sent
      */
-    public void sendMessage(String text) {
-        clientHandler.sendMessage(new Message(urlId, text).toString());
+    public void sendMessage(Message message) {
+        clientHandler.sendMessage(message.toString());
+    }
+
+    public String getCurrText() {
+        return currText;
+    }
+
+    public String getPrevText() {
+        return prevText;
+    }
+
+    public void setCurrText(String currText) {
+        this.currText = currText;
+    }
+
+    public void setPrevText(String prevText) {
+        this.prevText = prevText;
+    }
+
+    public ClientHandler getClientHandler() {
+        return clientHandler;
     }
 }
