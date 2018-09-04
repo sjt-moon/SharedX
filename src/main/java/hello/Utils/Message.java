@@ -20,6 +20,10 @@ public class Message {
         this.text = text;
     }
 
+    public boolean isACK() {
+        return insertPosition == -1;
+    }
+
     @Override
     public String toString() {
         return gson.toJson(this) + MetaUtils.LINE_SEPARATOR;

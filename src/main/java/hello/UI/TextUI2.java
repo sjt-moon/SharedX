@@ -128,21 +128,41 @@ public class TextUI2 extends UI {
         Runnable task = () -> {
             while (true) {
                 Message recv = receivedMessageQueue.poll();
-                System.out.println("here: " + (recv == null ? "null" : recv.getText()));
 
-                /*
-                 * apply operational transformation */
-                if (recv != null && !localOperationQueue.isEmpty()) {
-                    recv = OperationalTransformationUtils.insertInsert(localOperationQueue.poll(), recv);
+                if (recv == null) {
+                    System.out.println("Null recv");
                 }
+                else if (recv.isACK()) {
+                    if (!localOperationQueue.isEmpty()) {
+                        localOperationQueue.poll();
+                    }
+                    System.out.println("Size: " + localOperationQueue.size());
+                }
+                else {
+                    /*
+                     * apply operational transformation
+                     * todo: currently only insert-insert, Message.type should tell us insert/delete etc */
+                    if (!localOperationQueue.isEmpty()) {
+                        recv = OperationalTransformationUtils.insertInsert(localOperationQueue.poll(), recv);
+                    }
 
-                if (recv != null) {
-                    String consistentText = OperationalTransformationUtils.insertString(client.getCurrText(),
-                            recv.getText(), recv.getInsertPosition());
+                    if (recv != null) {
+                        System.out.println(urlId);
+                        String consistentText = OperationalTransformationUtils.insertString(client.getCurrText(),
+                                recv.getText(), recv.getInsertPosition());
 
-                    access(() -> textArea.setValue(consistentText));
-                    client.setPrevText(client.getCurrText());
-                    client.setCurrText(consistentText);
+                        access(() -> textArea.setValue(consistentText));
+
+                        /*
+                         * as prev == curr, no messages will be sent */
+                        client.setPrevText(client.getCurrText());
+                        client.setCurrText(consistentText);
+                        // client.setOrigin(consistentText);
+                    }
+
+                    /*
+                     * send back an ACK */
+                    client.sendMessage(new Message(urlId, -1, "ACK"));
                 }
             }
         };

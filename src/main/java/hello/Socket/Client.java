@@ -19,6 +19,8 @@ public final class Client implements Runnable {
      */
     private final String urlId;
 
+    private String origin = "";
+
     /**
      * previous text read from text editor
      */
@@ -93,12 +95,20 @@ public final class Client implements Runnable {
         return prevText;
     }
 
+    public String getOrigin() {
+        return origin;
+    }
+
     public void setCurrText(String currText) {
         this.currText = currText;
     }
 
     public void setPrevText(String prevText) {
         this.prevText = prevText;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     public ClientHandler getClientHandler() {

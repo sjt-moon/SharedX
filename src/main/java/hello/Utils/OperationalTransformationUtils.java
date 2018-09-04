@@ -9,6 +9,9 @@ public class OperationalTransformationUtils {
      * @return transformation of remote op
      */
     public static Message insertInsert(Message local, Message recv) {
+        System.out.println(local.getText());
+        System.out.println(recv.getText());
+
         int localInsertPosition = local.getInsertPosition();
         int recvInsertPosition = recv.getInsertPosition();
 
@@ -33,6 +36,7 @@ public class OperationalTransformationUtils {
      * @return inserted results
      */
     public static String insertString(String a, String b, int x) {
+        System.out.println("merge: " + a + "|" + b + "|" + x);
         if (x >= a.length()) {
             return a + b;
         }
