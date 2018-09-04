@@ -1,8 +1,11 @@
 package hello.Socket;
 
 import hello.Utils.Message;
+import hello.Utils.ThreadSafeQueue;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import java.util.Stack;
 
 public class ClientHandler extends SimpleChannelInboundHandler<String> {
 
@@ -13,9 +16,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
 
     private ChannelHandlerContext ctx;
 
-    public boolean used = false;
-
-    public Message receivedMessage = null;
+    public ThreadSafeQueue<Message> receivedMessageQueue = new ThreadSafeQueue<>();
 
     ClientHandler(String urlId) {
         super();
@@ -56,7 +57,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
         if (recv == null) {
             return;
         }
-        receivedMessage = recv;
-        used = false;
+        receivedMessageQueue.add(recv);
     }
 }

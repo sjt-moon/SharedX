@@ -11,6 +11,7 @@ import hello.Socket.Client;
 import hello.Utils.Message;
 import hello.Utils.OperationalTransformationUtils;
 import hello.Utils.SocketThreadFactory;
+import hello.Utils.ThreadSafeQueue;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Stack;
@@ -125,24 +126,28 @@ public class TextUI extends UI {
      * monitor on ClientHandler, if received ops from server, send it here to push up to browser
      */
     private void startValueChangeMonitor() {
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        ThreadSafeQueue<Message> receivedMessageQueue = client.getClientHandler().receivedMessageQueue;
+
         Runnable task = () -> {
-            Message recv = client.getClientHandler().receivedMessage;
-            System.out.println("here: " + (recv == null ? "null" : recv.getText()));
-            if (recv != null) {
-                /*
-                * apply operational transformation */
-                if (!localOperation.isEmpty()) {
-                    recv = OperationalTransformationUtils.insertInsert(localOperation.pop(), recv);
+            while (true) {
+                Message recv = receivedMessageQueue.poll();
+                System.out.println("here: " + (recv == null ? "null" : recv.getText()));
+                if (recv != null) {
+                    /*
+                     * apply operational transformation */
+                    if (!localOperation.isEmpty()) {
+                        recv = OperationalTransformationUtils.insertInsert(localOperation.pop(), recv);
+                    }
+
+                    String consistentText = client.getCurrText().substring(0, recv.getInsertPosition())
+                            + recv.getText() + client.getCurrText().substring(recv.getInsertPosition());
+
+                    access(() -> textArea.setValue("updated: " + consistentText));
                 }
-
-                String consistentText = client.getCurrText().substring(0, recv.getInsertPosition())
-                        + recv.getText() + client.getCurrText().substring(recv.getInsertPosition());
-
-                access(() -> textArea.setValue("updated: " + consistentText));
-                client.getClientHandler().receivedMessage = null;
             }
         };
-        scheduledExecutorService.scheduleWithFixedDelay(task, SLEEP_DURATION, SLEEP_DURATION, TimeUnit.SECONDS);
+
+        Thread thread = new SocketThreadFactory().newThread(task);
+        thread.start();
     }
 }
