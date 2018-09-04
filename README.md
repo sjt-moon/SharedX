@@ -7,6 +7,7 @@
 * Netty
 * Vaadin
 * Operational Transformation
+* Thread-safe operation queue: condition variable
 
 ### Structure
 #### Server
