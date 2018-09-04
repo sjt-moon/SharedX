@@ -12,6 +12,10 @@ public class OperationalTransformationUtils {
         int localInsertPosition = local.getInsertPosition();
         int recvInsertPosition = recv.getInsertPosition();
 
+        if (local.getText().equals(recv.getText())) {
+            return null;
+        }
+
         boolean sameInsertionPositionSmallerId = localInsertPosition == recvInsertPosition && local.getUrlId().compareTo(recv.getUrlId()) < 0;
 
         if (localInsertPosition < recvInsertPosition || sameInsertionPositionSmallerId) {
@@ -19,5 +23,19 @@ public class OperationalTransformationUtils {
         }
 
         return recv;
+    }
+
+    /**
+     * insert b into a at position x
+     * @param a original string
+     * @param b insert string
+     * @param x insert point
+     * @return inserted results
+     */
+    public static String insertString(String a, String b, int x) {
+        if (x >= a.length()) {
+            return a + b;
+        }
+        return a.substring(0, x) + b + a.substring(x);
     }
 }

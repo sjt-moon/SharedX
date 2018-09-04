@@ -14,13 +14,13 @@ import hello.Utils.ThreadSafeQueue;
 import org.apache.logging.log4j.util.Strings;
 import java.util.concurrent.*;
 
-import static hello.UI.TextUI.urlId;
+import static hello.UI.TextUI2.urlId;
 
 @Push
 @SpringUI(path = urlId)
-public class TextUI extends UI {
+public class TextUI2 extends UI {
 
-    static final String urlId = "/text";
+    static final String urlId = "/text2";
 
     private VerticalLayout layout;
 
@@ -95,12 +95,12 @@ public class TextUI extends UI {
         Runnable task = () -> {
 
             /*
-            * update text captured from editor */
+             * update text captured from editor */
             client.setPrevText(client.getCurrText());
             client.setCurrText(textArea.getValue());
 
             /*
-            * todo: only insertion is considered currently */
+             * todo: only insertion is considered currently */
             StringBuilder insertedText = new StringBuilder();
             int insertPosition = Message.getDiff(client.getPrevText(), client.getCurrText(), insertedText);
             String text = insertedText.toString();

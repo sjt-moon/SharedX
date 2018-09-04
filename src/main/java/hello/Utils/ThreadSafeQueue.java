@@ -55,4 +55,8 @@ public class ThreadSafeQueue<T> {
         }
         return null;
     }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
 }

@@ -53,8 +53,9 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
 
         Message recv = Message.getMessage(message);
         /*
-        * if null or recv is not parsed successfully */
-        if (recv == null) {
+        * if recv is not parsed successfully, recv is null
+        * if recv is sent from this client, ignore it. only care for other clients messages */
+        if (recv == null || recv.getUrlId().equalsIgnoreCase(urlId)) {
             return;
         }
         receivedMessageQueue.add(recv);
